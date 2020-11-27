@@ -23,7 +23,6 @@ const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = React.useState(false);
 const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = React.useState(false);
 const [isInfoTooltipOpen, setIsInfoTooltipOpen] = React.useState(false);
 const [selectedCard, setCardSelected] = React.useState(null);
-const [currentUser, setCurrentUser] = React.useState('');
 const [cards, setCards] = React.useState([]);
 const [loggedIn, setIsLoggedIn] = React.useState(false);
 const [userData, setUserData] = React.useState({});
@@ -40,22 +39,12 @@ React.useEffect(() => {
 }, []);
 
 React.useEffect(() => {
-  api.getUser()
-  .then(res => {
-      setCurrentUser(res);
-  })
-  .catch((err) => {
-      console.log(err);
-  })
-}, []);
-
-React.useEffect(() => {
     if (localStorage.getItem('jwt')) {
       const jwt = localStorage.getItem('jwt'); 
   
       Auth.getContent(jwt).then((res) => {
         if (res) {
-          setUserData(res.data)
+          setUserData(res)
           handleLoggedIn();
           history.push('/');
         }
@@ -64,7 +53,7 @@ React.useEffect(() => {
 }, [history]);
 
 function handleCardLike(card) {
-    const isLiked = card.likes.some(i => i._id === currentUser._id);
+    const isLiked = card.likes.some(i => i._id === userData._id);
 
     if(!isLiked) {
         api.addLike(card)
@@ -89,7 +78,7 @@ function handleCardLike(card) {
 
 function handleCardDelete(card) {
 
-    const isDeletable = card.owner._id === currentUser._id;
+    const isDeletable = card.owner === userData._id;
 
     if (isDeletable) {
         api.deleteCard(card._id)
@@ -145,7 +134,7 @@ function handleCardClick(card) {
 function handleUpdateUser(newUser) {
   api.changeUser(newUser)
   .then(res => {
-      setCurrentUser(res);
+      setUserData(res);
       closeAllPopups();
   })
   .catch((err) => {
@@ -156,7 +145,7 @@ function handleUpdateUser(newUser) {
 function handleUpdateAvatar(newAvatar) {
   api.changeAvatar(newAvatar)
   .then(res => {
-      setCurrentUser(res);
+      setUserData(res);
       closeAllPopups();
   })
   .catch((err) => {
@@ -186,7 +175,7 @@ function handleLoggedOut() {
   return (
     <div className="page">
 
-      <CurrentUserContext.Provider value={currentUser}>
+      <CurrentUserContext.Provider value={userData}>
 
           <Header 
           userData = {userData}

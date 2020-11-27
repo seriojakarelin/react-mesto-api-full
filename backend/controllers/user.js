@@ -70,7 +70,6 @@ module.exports.createUser = (req, res) => {
 
 module.exports.login = (req, res) => {
   const { email, password } = req.body;
-
   User.findOne({ email }).select('+password')
     .then((user) => {
       if (!user) {
@@ -82,10 +81,9 @@ module.exports.login = (req, res) => {
           return Promise.reject(new Error('Неправильные почта или пароль'));
         }
 
-        const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
-        console.log('!!!!!!')
-        console.log(token)
-        return res.send({ token });
+        const token = jwt.sign({ _id: user._id }, 'some-secret-key', { noTimestamp: true, expiresIn: '7d' });
+
+        return res.send({ token, user });
       });
     })
     .catch((err) => {

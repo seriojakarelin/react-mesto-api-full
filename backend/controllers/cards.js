@@ -19,7 +19,7 @@ module.exports.createCard = ((req, res) => {
   const { name, link } = req.body;
   Card.create({ name, link, owner: _id })
     .then((card) => {
-      res.status(200).send({ data: card });
+      res.status(200).send(card);
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -34,7 +34,7 @@ module.exports.deleteCard = ((req, res) => {
   Card.findByIdAndDelete({ _id: req.params.id })
     .orFail(() => new Error('NotFound', 'Нет карточки с таким id'))
     .then((card) => {
-      if (req.params.id !== card.owner) {
+      if (!card.owner.equals(req.user._id)) {
         return Promise.reject(new Error('Нет прав для удаления карточки'));
       }
       return res.status(200).send(card);

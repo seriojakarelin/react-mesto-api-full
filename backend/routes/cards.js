@@ -1,11 +1,11 @@
 const cardsRouter = require('express').Router();
-
 const { getCards, createCard, deleteCard } = require('../controllers/cards');
+const { auth } = require('../middlewares/auth');
 
-cardsRouter.get('/cards', getCards);
+cardsRouter.get('/cards', auth, getCards);
 
-cardsRouter.post('/cards', createCard);
+cardsRouter.post('/cards', auth, createCard);
 
-cardsRouter.delete('/cards/:id', deleteCard);
+cardsRouter.delete('/cards/:id', auth, deleteCard);
 
 module.exports = cardsRouter;

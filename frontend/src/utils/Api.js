@@ -1,3 +1,5 @@
+import { config } from '../constants/config';
+
 class Api {
     constructor( {url, headers}) {
         this._url = url;
@@ -96,6 +98,7 @@ class Api {
     }
 
     createCard(item) {
+        console.log(item)
         return fetch(`${this._url}cards/`, {
             method: 'POST',
             headers: this._headers,
@@ -111,11 +114,8 @@ class Api {
 }
 
 const api = new Api({
-    url: 'http://localhost:3001/', 
-    headers: {
-        authorization: '3264da94-6a0d-46bd-9eaf-c8758f7396fd',
-        'Content-Type': 'application/json'
-    }
+    url: config.url, 
+    headers: config.headers
 });
 
 export {api}
