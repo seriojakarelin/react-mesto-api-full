@@ -20,9 +20,10 @@ function Register(props) {
         e.preventDefault()
 
         Auth.register(email, password).then((res) => {
-            console.log(res)
             if (res) {
-                history.push('/sign-in')
+                props.handleSignedUp();
+                history.push('/sign-in');
+                props.handleInfoTooltipOpen();
             }
         })
     }
@@ -32,8 +33,8 @@ function Register(props) {
                 <div className="login__container">
                     <h2 className="login__title">Регистрация</h2>
                     <form className="login__forms" noValidate>
-                        <input id="login-email" type="email" className="login__input" value={email} onChange={handleEmailChange} placeholder="Email" required minLength="1" maxLength="30" />
-                        <input id="login-password" type="password" className="login__input" value={password} onChange={handlePasswordChange} placeholder="Пароль" minLength="1" maxLength="30" required />
+                        <input id="login-email" type="email" className="login__input" value={email} onChange={handleEmailChange} placeholder="Email" required minLength="2" maxLength="30" />
+                        <input id="login-password" type="password" className="login__input" value={password} onChange={handlePasswordChange} placeholder="Пароль" minLength="2" maxLength="30" required />
                         <button className="login__submit-button" type="submit" onClick={handleSubmit}>Зарегистрироваться</button>
                     </form>
                     <Link className="login__link" to="/sign-in">Уже зарегистрированы? Войти</Link>

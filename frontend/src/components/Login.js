@@ -21,12 +21,13 @@ function Login(props) {
 
         Auth.authorize(email, password).then((data) => {
             if (data.token) {
+                props.setUserData(data.user);
                 props.handleLoggedIn();
                 history.push('/');
-                props.handleInfoTooltipOpen();
             } 
         })
         .catch(() => {
+            props.setIsSignedUp(false);
             props.handleInfoTooltipOpen();
         })
     }
@@ -37,8 +38,8 @@ function Login(props) {
                 <div className="login__container">
                     <h2 className="login__title">Вход</h2>
                     <form className="login__forms" noValidate>
-                        <input id="login-email" type="email" className="login__input" value={email} onChange={handleEmailChange} placeholder="Email" required minLength="1" maxLength="30" />
-                        <input id="login-password" type="password" className="login__input" value={password} onChange={handlePasswordChange} placeholder="Пароль" minLength="1" maxLength="30" required />
+                        <input id="login-email" type="email" className="login__input" value={email} onChange={handleEmailChange} placeholder="Email" required minLength="2" maxLength="30" />
+                        <input id="login-password" type="password" className="login__input" value={password} onChange={handlePasswordChange} placeholder="Пароль" minLength="2" maxLength="30" required />
                         <button className="login__submit-button" type="submit" onClick={handleSubmit}>Войти</button>
                     </form>
                 </div>

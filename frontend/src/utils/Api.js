@@ -1,52 +1,15 @@
-import { config } from '../constants/config';
-
 class Api {
-    constructor( {url, headers}) {
+    constructor( {url} ) {
         this._url = url;
-        this._headers = headers;
-    }
-
-    getUser() {
-        return fetch(`${this._url}users/me/`, {
-            headers: this._headers
-        })
-        .then(res => {
-            if (res.ok) {
-                return res.json();
-            }
-            return Promise.reject(`Ошибка: ${res.status}`);
-        })
     }
 
     getCards() {
+        const token = localStorage.getItem('jwt');
         return fetch(`${this._url}cards/`, {
-            headers: this._headers
-        })
-        .then(res => {
-            if (res.ok) {
-                return res.json();
-            }
-            return Promise.reject(`Ошибка: ${res.status}`);
-        })
-    }
-
-    addLike(item) {
-        return fetch(`${this._url}cards/likes/${item._id}`, {
-            method: 'PUT',
-            headers: this._headers,
-        })
-        .then(res => {
-            if (res.ok) {
-                return res.json();
-            }
-            return Promise.reject(`Ошибка: ${res.status}`);
-        })
-    }
-
-    deleteLike(id) {
-        return fetch(`${this._url}cards/likes/${id}`, {
-            method: 'DELETE',
-            headers: this._headers,
+            headers: {
+                authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
         })
         .then(res => {
             if (res.ok) {
@@ -57,37 +20,13 @@ class Api {
     }
 
     deleteCard(id) {
+        const token = localStorage.getItem('jwt');
         return fetch(`${this._url}cards/${id}`, {
             method: 'DELETE',
-            headers: this._headers,
-        })
-        .then(res => {
-            if (res.ok) {
-                return res.json();
-            }
-            return Promise.reject(`Ошибка: ${res.status}`);
-        })
-    }
-
-    changeUser(item) {
-        return fetch(`${this._url}users/me/`, {
-            method: 'PATCH',
-            headers: this._headers,
-            body: JSON.stringify(item)
-        })
-        .then(res => {
-            if (res.ok) {
-                return res.json();
-            }
-            return Promise.reject(`Ошибка: ${res.status}`);
-        })
-    }
-
-    changeAvatar(item) {
-        return fetch(`${this._url}users/me/avatar/`, {
-            method: 'PATCH',
-            headers: this._headers,
-            body: JSON.stringify(item)
+            headers: {
+                authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
         })
         .then(res => {
             if (res.ok) {
@@ -98,10 +37,13 @@ class Api {
     }
 
     createCard(item) {
-        console.log(item)
+        const token = localStorage.getItem('jwt');
         return fetch(`${this._url}cards/`, {
             method: 'POST',
-            headers: this._headers,
+            headers: {
+                authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
             body: JSON.stringify(item)
         })
         .then(res => {
@@ -114,8 +56,7 @@ class Api {
 }
 
 const api = new Api({
-    url: config.url, 
-    headers: config.headers
+    url: 'http://localhost:3001/', 
 });
 
 export {api}

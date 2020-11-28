@@ -1,84 +1,88 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
+const NotFoundError = require('../errors/not-found-err');
+const UnauthorizedError = require('../errors/unauthorized-err');
+const BadRequestError = require('../errors/bad-request-error');
 
-const NOT_FOUND = 404;
-const BAD_REQUEST = 400;
-const SERVER_ERROR = 500;
-
-module.exports.getUsers = (req, res) => {
+module.exports.getUsers = (req, res, next) => {
   User.find({})
     .then((data) => {
       res.status(200).send(data);
     })
-    .catch(() => {
-      res.status(SERVER_ERROR).send({ message: 'Ошибка на сервере' });
-    });
+    .catch(next);
 };
 
-module.exports.getCurrentUser = (req, res) => {
+module.exports.getCurrentUser = (req, res, next) => {
   User.findOne({ _id: req.user._id })
+    .orFail(new Error('NotFound'))
     .then((data) => {
       res.status(200).send(data);
     })
-    .catch(() => {
-      res.status(SERVER_ERROR).send({ message: 'Ошибка на сервере' });
-    });
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        throw new BadRequestError('Ошибка валидации');
+      } else if (err.message === 'NotFound') {
+        throw new NotFoundError('Нет пользователя с таким id');
+      }
+      throw err;
+    })
+    .catch(next);
 };
 
-module.exports.getUser = (req, res) => {
+module.exports.getUser = (req, res, next) => {
   User.findById({ _id: req.params.id })
-    .orFail(() => new Error('NotFound', 'Нет пользователя с таким id'))
+    .orFail(new Error('NotFound'))
     .then((user) => {
       res.status(200).send(user);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(BAD_REQUEST).send({ message: 'Ошибка валидации пользователя' });
+        throw new BadRequestError('Ошибка валидации');
       } else if (err.message === 'NotFound') {
-        res.status(NOT_FOUND).send({ message: 'Нет пользователя с таким id' });
-      } else {
-        res.status(SERVER_ERROR).send({ message: 'Ошибка на сервере' });
+        throw new NotFoundError('Нет пользователя с таким id');
       }
-    });
+      throw err;
+    })
+    .catch(next);
 };
 
-module.exports.createUser = (req, res) => {
+module.exports.createUser = (req, res, next) => {
   const {
     name, about, avatar, email, password,
   } = req.body;
 
   bcrypt.hash(password, 10)
     .then((hash) => User.create({
-      name: name,
-      about: about,
-      avatar: avatar,
-      email: email,
+      name,
+      about,
+      avatar,
+      email,
       password: hash,
     }))
     .then((user) => {
       res.status(200).send({ data: user });
     })
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res.status(BAD_REQUEST).send({ message: 'Ошибка валидации пользователя' });
-      } else {
-        res.status(SERVER_ERROR).send({ message: 'Ошибка на сервере' });
+    .catch((error) => {
+      if (error.name === 'ValidationError') {
+        throw new BadRequestError('Ошибка валидации');
       }
-    });
+      throw error;
+    })
+    .catch(next);
 };
 
-module.exports.login = (req, res) => {
+module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
   User.findOne({ email }).select('+password')
     .then((user) => {
       if (!user) {
-        return Promise.reject(new Error('Неправильные почта или пароль'));
+        throw new UnauthorizedError('Неправильные почта или пароль');
       }
 
       return bcrypt.compare(password, user.password).then((matched) => {
         if (!matched) {
-          return Promise.reject(new Error('Неправильные почта или пароль'));
+          throw new UnauthorizedError('Неправильные почта или пароль');
         }
 
         const token = jwt.sign({ _id: user._id }, 'some-secret-key', { noTimestamp: true, expiresIn: '7d' });
@@ -86,7 +90,5 @@ module.exports.login = (req, res) => {
         return res.send({ token, user });
       });
     })
-    .catch((err) => {
-      res.status(401).send({ message: err.message });
-    });
+    .catch(next);
 };

@@ -9,20 +9,11 @@ function Card(props) {
         props.onCardClick(props.card);
     } 
 
-    function handleLikeClick() {
-        props.onCardLike(props.card);
-    }
-
     function handleDeleteClick() {
         props.onCardDelete(props.card);
     }
 
     const isOwn = props.card.owner === currentUserInfo._id;
-    const isLiked = props.card.likes.some(i => i._id === currentUserInfo._id);
-
-    const cardLikeButtonClassName = (
-        `gallery__like-button button ${isLiked ? 'gallery__like-button_active' : ''}`
-      ); 
     
     return(
         <li className="gallery__card">
@@ -30,10 +21,6 @@ function Card(props) {
             <img className="gallery__photo" src={props.card.link} alt={props.card.name} onClick={handleClick} />
             <div className="gallery__info-container">
                 <h2 className="gallery__photo-title">{props.card.name}</h2>
-                <div className="gallery__like-container">
-                    <button className={cardLikeButtonClassName} type="button" onClick={handleLikeClick}></button>
-                    <p className="gallery__like-number">{props.card.likes.length}</p>
-                </div>
             </div>
         </li>
     )

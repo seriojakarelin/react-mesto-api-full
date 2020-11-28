@@ -10,12 +10,9 @@ function Main(props) {
         <main className="content">
 
             <section className="profile">
-                <div className="profile__avatar" style={{ backgroundImage: `url(${currentUserInfo.avatar})` }}>
-                    <button className="profile__avatar-edit-button" type="button" onClick={props.onEditAvatar}></button>
-                </div>
+                <div className="profile__avatar" style={{ backgroundImage: `url(${currentUserInfo.avatar})` }}></div>
                 <div className="profile__info">
                     <h1 className="profile__name">{currentUserInfo.name}</h1>
-                    <button className="button profile__edit-button" type="button" onClick={props.onEditProfile}></button>
                     <p className="profile__job">{currentUserInfo.about}</p>
                 </div>
                 <button className="button profile__add-button" type="button" onClick={props.onAddPlace}></button>
@@ -28,7 +25,6 @@ function Main(props) {
                         key={card._id} 
                         card={card} 
                         onCardClick={props.onCardClick} 
-                        onCardLike={props.onCardLike} 
                         onCardDelete={props.onCardDelete} />
                 )}
 

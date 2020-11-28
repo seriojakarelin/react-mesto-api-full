@@ -68,6 +68,5 @@ export const authorize = (email, password) => {
         return false
     }
     })
-    .then(data => data)
     .catch((err) => console.log(err))
   } 

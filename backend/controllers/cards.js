@@ -1,20 +1,17 @@
 const Card = require('../models/card');
+const NotFoundError = require('../errors/not-found-err');
+const ForbiddenError = require('../errors/forbidden-error');
+const BadRequestError = require('../errors/bad-request-error');
 
-const NOT_FOUND = 404;
-const BAD_REQUEST = 400;
-const SERVER_ERROR = 500;
-
-module.exports.getCards = ((req, res) => {
+module.exports.getCards = ((req, res, next) => {
   Card.find({})
     .then((data) => {
       res.status(200).send(data);
     })
-    .catch(() => {
-      res.status(SERVER_ERROR).send({ message: 'Ошибка на сервере' });
-    });
+    .catch(next);
 });
 
-module.exports.createCard = ((req, res) => {
+module.exports.createCard = ((req, res, next) => {
   const { _id } = req.user;
   const { name, link } = req.body;
   Card.create({ name, link, owner: _id })
@@ -23,29 +20,29 @@ module.exports.createCard = ((req, res) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(BAD_REQUEST).send({ message: 'Ошибка валидации карточки' });
-      } else {
-        res.status(SERVER_ERROR).send({ message: 'Ошибка на сервере' });
+        throw new BadRequestError('Ошибка валидации');
       }
-    });
+      throw err;
+    })
+    .catch(next);
 });
 
-module.exports.deleteCard = ((req, res) => {
+module.exports.deleteCard = ((req, res, next) => {
   Card.findByIdAndDelete({ _id: req.params.id })
-    .orFail(() => new Error('NotFound', 'Нет карточки с таким id'))
+    .orFail(new Error('Нет карточки с таким id'))
     .then((card) => {
       if (!card.owner.equals(req.user._id)) {
-        return Promise.reject(new Error('Нет прав для удаления карточки'));
+        throw new ForbiddenError('Недостаточно прав для удаления карточки');
       }
       return res.status(200).send(card);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(BAD_REQUEST).send({ message: 'Ошибка валидации карточки' });
+        throw new BadRequestError('Ошибка валидации');
       } else if (err.message === 'NotFound') {
-        res.status(NOT_FOUND).send({ message: 'Нет карточки с таким id' });
-      } else {
-        res.status(SERVER_ERROR).send({ message: 'Ошибка на сервере' });
+        throw new NotFoundError('Нет карточки с таким id');
       }
-    });
+      throw err;
+    })
+    .catch(next);
 });
