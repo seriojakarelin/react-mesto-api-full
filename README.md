@@ -5,4 +5,4 @@
 
 http://seriojakarelin.students.nomoredomains.work/
 
-Стек технологий: MongoDB, JavaScript, Git, Node.js, API REST.
+Стек технологий: MongoDB, JavaScript, React, Git, Node.js, API REST.
