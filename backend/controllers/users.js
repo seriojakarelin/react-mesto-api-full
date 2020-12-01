@@ -4,6 +4,7 @@ const User = require('../models/user');
 const NotFoundError = require('../errors/not-found-err');
 const UnauthorizedError = require('../errors/unauthorized-err');
 const BadRequestError = require('../errors/bad-request-error');
+const ConflictError = require('../errors/conflict-error');
 
 module.exports.getUsers = (req, res, next) => {
   User.find({})
@@ -52,6 +53,13 @@ module.exports.createUser = (req, res, next) => {
     name, about, avatar, email, password,
   } = req.body;
 
+  User.findOne({ email: req.body.email })
+    .then((user) => {
+      if (user) {
+        throw new ConflictError('Пользователь с таким email уже существует');
+      }
+    });
+
   bcrypt.hash(password, 10)
     .then((hash) => User.create({
       name,
@@ -60,7 +68,13 @@ module.exports.createUser = (req, res, next) => {
       email,
       password: hash,
     }))
-    .then((user) => {
+    .then((createdUser) => {
+      const user = {
+        name: createdUser.name,
+        about: createdUser.about,
+        avatar: createdUser.avatar,
+        email: createdUser.email,
+      };
       res.status(200).send({ data: user });
     })
     .catch((error) => {

@@ -6,16 +6,17 @@ const {
   createUser,
   getCurrentUser,
   login,
-} = require('../controllers/user');
+} = require('../controllers/users');
 const { auth } = require('../middlewares/auth');
 const { signUpValidation } = require('../middlewares/validation/signup-validation');
 const { signInValidation } = require('../middlewares/validation/signin-validation');
+const { userIdValidation } = require('../middlewares/validation/user-id-validation');
 
 usersRouter.get('/users', auth, getUsers);
 
 usersRouter.get('/users/me', auth, getCurrentUser);
 
-usersRouter.get('/users/:id', auth, getUser);
+usersRouter.get('/users/:id', celebrate(userIdValidation), auth, getUser);
 
 usersRouter.post('/signin', celebrate(signInValidation), login);
 
