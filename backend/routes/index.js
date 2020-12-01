@@ -6,10 +6,10 @@ const notFoundRouter = require('./notFound');
 const crashTestRouter = require('./crashTest');
 
 router.use(
+  crashTestRouter,
   usersRouter,
   cardsRouter,
   notFoundRouter,
-  crashTestRouter,
 );
 
 module.exports = router;
