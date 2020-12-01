@@ -5,4 +5,8 @@
 
 http://seriojakarelin.students.nomoredomains.work/
 
+Crash-test по адресу:
+
+http://seriojakarelin.students.nomoredomains.work/crash-test
+
 Стек технологий: MongoDB, JavaScript, React, Git, Node.js, API REST.
