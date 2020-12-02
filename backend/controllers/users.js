@@ -16,7 +16,7 @@ module.exports.getUsers = (req, res, next) => {
 
 module.exports.getCurrentUser = (req, res, next) => {
   User.findOne({ _id: req.user._id })
-    .orFail(new NotFoundError('NotFound'))
+    .orFail(new NotFoundError('Пользователь с таким id не найден'))
     .then((data) => {
       res.status(200).send(data);
     })
@@ -31,7 +31,7 @@ module.exports.getCurrentUser = (req, res, next) => {
 
 module.exports.getUser = (req, res, next) => {
   User.findById({ _id: req.params.id })
-    .orFail(new NotFoundError('NotFound'))
+    .orFail(new NotFoundError('Пользователь с таким id не найден'))
     .then((user) => {
       res.status(200).send(user);
     })
