@@ -16,15 +16,13 @@ module.exports.getUsers = (req, res, next) => {
 
 module.exports.getCurrentUser = (req, res, next) => {
   User.findOne({ _id: req.user._id })
-    .orFail(new Error('NotFound'))
+    .orFail(new NotFoundError('NotFound'))
     .then((data) => {
       res.status(200).send(data);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
         throw new BadRequestError('Ошибка валидации');
-      } else if (err.message === 'NotFound') {
-        throw new NotFoundError('Нет пользователя с таким id');
       }
       throw err;
     })
@@ -33,15 +31,13 @@ module.exports.getCurrentUser = (req, res, next) => {
 
 module.exports.getUser = (req, res, next) => {
   User.findById({ _id: req.params.id })
-    .orFail(new Error('NotFound'))
+    .orFail(new NotFoundError('NotFound'))
     .then((user) => {
       res.status(200).send(user);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
         throw new BadRequestError('Ошибка валидации');
-      } else if (err.message === 'NotFound') {
-        throw new NotFoundError('Нет пользователя с таким id');
       }
       throw err;
     })

@@ -28,21 +28,16 @@ module.exports.createCard = ((req, res, next) => {
 });
 
 module.exports.deleteCard = ((req, res, next) => {
-  Card.findByIdAndDelete({ _id: req.params.id })
-    .orFail(new Error('Нет карточки с таким id'))
+  Card.findById({ _id: req.params.id })
+    .orFail(new NotFoundError('Нет карточки с таким id'))
     .then((card) => {
       if (!card.owner.equals(req.user._id)) {
         throw new ForbiddenError('Недостаточно прав для удаления карточки');
       }
-      return res.status(200).send(card);
-    })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        throw new BadRequestError('Ошибка валидации');
-      } else if (err.message === 'NotFound') {
-        throw new NotFoundError('Нет карточки с таким id');
-      }
-      throw err;
+      Card.deleteOne(card)
+        .then(() => {
+          res.status(200).send(card);
+        });
     })
     .catch(next);
 });
